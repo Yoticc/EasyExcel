@@ -1,34 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EasyExcel.Excel;
-using NPOI.SS.UserModel;
+﻿using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 namespace EasyExcel;
 public class Book
 {
-    public Book(string toSavePath = "")
+    public Book(string pathToSave = "")
     {
+        Path = pathToSave;
         book = new XSSFWorkbook();
     }
+
+    private IWorkbook book;
+    private List<Sheet> sheets = new();
+
+    public string Path;
+
     public static Book Load(string path)
     {
-        Book book = new Book(path);
+        var book = new Book(path);
         book.LoadBook(path);
         return book;
     }
+
     private void LoadBook(string path)
-    {        
+    {
         book = new XSSFWorkbook(path);
         for (int i = 0; i < book.NumberOfSheets; i++)
             sheets.Add(new Sheet(book.GetSheetAt(i), this));
     }
-    private IWorkbook book;
-    private List<Sheet> sheets = new List<Sheet>();
-    public string Path { get; set; }
+
+    public void Save(string path) => Save(new FileStream(path.EndsWith(".xlsx") ? path : (path + ".xlsx"), FileMode.OpenOrCreate));
+    public void Save(Stream stream) => book.Write(stream);
+    public void Save() => Save(Path);
+
     public Sheet this[string name]
     {
         get
@@ -42,7 +46,4 @@ public class Book
             return sheets[index];
         }
     }
-    public void Save(string path) => Save(new FileStream(path.EndsWith(".xlsx") ? path : (path + ".xlsx"), FileMode.OpenOrCreate));
-    public void Save(Stream stream) => book.Write(stream);
-    public void Save() => Save(Path);
 }

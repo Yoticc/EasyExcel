@@ -1,13 +1,8 @@
 ﻿using NPOI.SS.UserModel;
 
 namespace EasyExcel;
-public class Cell
+public record Cell(ICell original)
 {
-    public Cell(ICell original)
-    {
-        this.original = original;
-    }
-    private ICell original;
     public string Formula { get => original.CellFormula; set => original.SetCellFormula(value); }
     public CellType Type { get => original.CellType; set => original.SetCellType(value); }
     public string StringValue { get => original.StringCellValue; set => original.SetCellValue(value); }
@@ -16,6 +11,7 @@ public class Cell
     public float FloatValue { get => (float)original.NumericCellValue; set => original.SetCellValue(value); }
     public int IntValue { get => (int)original.NumericCellValue; set => original.SetCellValue(value); }
     public long LongValue { get => long.Parse(original.StringCellValue); set => original.SetCellValue(value.ToString()); }
+
     public object Value
     {
         set
